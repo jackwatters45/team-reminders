@@ -1,0 +1,16 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version defined in pyproject.toml or managed by pre-commit
+    rev: 'v0.11.3' # Or pin to a specific version like rev: 'v0.4.2'
+    hooks:
+    -   id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        # Optional: Specify types_or if you only want it to run on python files in src
+        # types_or: [python, pyi]
+        # files: ^src/
+    -   id: ruff-format
+        # Optional: Specify types_or if you only want it to run on python files in src
+        # types_or: [python, pyi]
+        # files: ^src/ 
