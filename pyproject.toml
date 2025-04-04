@@ -1,0 +1,16 @@
+[project]
+name = "team-reminders"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.15.2",
+    "arq>=0.26.3",
+    "fastapi>=0.115.12",
+    "polars>=1.26.0",
+    "pydantic-settings>=2.8.1",
+    "sqlalchemy>=2.0.40",
+    "streamlit>=1.44.1",
+    "twilio>=9.5.1",
+]

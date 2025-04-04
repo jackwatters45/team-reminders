@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # db service removed
+
+  redis:
+    image: redis:7-alpine
+    expose:
+      - 6379
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build: .
+    # Command points to app instance in src/main.py
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      # Mount src directory for hot-reloading during development
+      - ./src:/app
+      # Mount the database file directly into the container
+      - ./database.db:/app/database.db
+    ports:
+      - "8000:8000"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Ensure necessary env vars for SQLite path are set if needed by settings.py
+      # e.g., SQLITE_DB_PATH=/app/database.db
+    depends_on:
+      # db dependency removed
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env # Load environment variables from .env file
+    restart: unless-stopped
+
+  worker:
+    build: .
+    # Command points to WorkerSettings class in src/worker.py
+    command: arq src.worker.WorkerSettings --watch /app
+    volumes:
+      # Mount src directory for code changes during development
+      - ./src:/app
+      # Mount the database file directly into the container
+      - ./database.db:/app/database.db
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      # Ensure necessary env vars for SQLite path are set if needed by settings.py
+      # e.g., SQLITE_DB_PATH=/app/database.db
+    depends_on:
+      # db dependency removed
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env # Load environment variables from .env file
+    restart: unless-stopped # Keep worker running
+
+volumes:
+  # postgres_data volume removed
+  redis_data:
+  # No separate volume needed for SQLite if mounting the file directly
